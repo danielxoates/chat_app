@@ -1,10 +1,11 @@
 import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Avatar } from 'react-native-elements';
+import { Avatar, Button, Image } from 'react-native-elements';
 import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { addDoc, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import homeImage from '../assets/home.png';
 
 const Chat =({navigation}) => {
     const [messages, setMessages] = useState([]);
@@ -15,25 +16,29 @@ const Chat =({navigation}) => {
             Alert('Error occured');
         });
     }
+
+    const returnToHome = () =>{
+        navigation.navigate('HomePage')
+    }
+
     useLayoutEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
-                <View style={{marginLeft: 20}}>
-                    <Avatar
-                        rounded
-                        source={{
-                            uri: auth.currentUser?.photoURL,
-                        }}/>
-                </View>
-            ),
-            headerRight: () => (
                 <TouchableOpacity style={{
-                    marginRight: 10
+                    marginLeft: 20
                 }}
                 onPress={signOutNow}
             >
                 <Text>Logout</Text>
             </TouchableOpacity>
+            ),
+            headerRight: () => (
+                <TouchableOpacity style={{
+                    marginRight: 20}}
+                    onPress={returnToHome}
+                >
+                    <Image source={homeImage} style={{ height: 20, width: 20}}/>
+                </TouchableOpacity>
             )
         })
 
@@ -72,7 +77,12 @@ const Chat =({navigation}) => {
 
         addDoc(collection(db, 'chats'), {_id, createdAt, text, user});
     }, []);
+
+    
     return (
+        
+        
+            
         <GiftedChat
             messages={messages}
             showAvatarForEveryMessage={true}
@@ -80,10 +90,29 @@ const Chat =({navigation}) => {
             user={{
                 _id: auth?.currentUser?.email,
                 name: auth?.currentUser?.displayName,
-                avatar: auth?.currentUser?.photoURL,
+                 avatar: auth?.currentUser?.photoURL,
             }}
         />
+            
+       
+            
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        padding: 10,
+        marginTop: 100,
+    },
+    button: {
+        width: 370,
+        marginTop: 10
+    },
+    bottomContainer: {
+        flex: 1,
+    }
+});
 
 export default Chat;

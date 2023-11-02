@@ -12,11 +12,14 @@ const Login = ({navigation}) => {
     const openRegisterScreen = () => {
         navigation.navigate('Register');
     }
+    const instantLogin = () => {
+        navigation.navigate('HomePage');
+    }
 
     const signin = () => {
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                navigation.navigate('Chat')
+                navigation.navigate('HomePage')
             })
             .catch((error) => {
                 const errorCode=error.code;
@@ -42,8 +45,8 @@ const Login = ({navigation}) => {
                 onChangeText={text => setPassword(text)}
                 secureTextEntry
             />
-            <Button title='sign in' style={styles.button} onPress={signin}/>
-            <Button title='register' style={styles.button} onPress={openRegisterScreen}/>
+            <Button title='Sign in' style={styles.button} onPress={instantLogin}/>
+            <Button title='Register' style={styles.button} onPress={openRegisterScreen}/>
         </View>
     )
 }
