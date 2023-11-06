@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Avatar, Button, Image } from 'react-native-elements';
 import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
@@ -7,10 +7,9 @@ import { GiftedChat } from 'react-native-gifted-chat';
 import { addDoc, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import homeImage from '../assets/home.png';
 
-const Chat =({navigation}) => {
+
+const AIChat =({navigation}) => {
     const [messages, setMessages] = useState([]);
-    const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const signOutNow = () => {
         signOut(auth).then(() => {
             navigation.navigate('Login');
@@ -23,25 +22,8 @@ const Chat =({navigation}) => {
         navigation.navigate('Home Page')
     }
 
-    const openAI = () =>{
-        navigation.navigate('AI Chat')
-    }
-
-    const openUser = () =>{
-        navigation.navigate('User Chat')
-    }
-
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerLeft: () => (
-                <TouchableOpacity style={{
-                    marginLeft: 20
-                }}
-                onPress={signOutNow}
-            >
-                <Text>Logout</Text>
-            </TouchableOpacity>
-            ),
             headerRight: () => (
                 <TouchableOpacity style={{
                     marginRight: 20}}
@@ -91,19 +73,19 @@ const Chat =({navigation}) => {
     
     return (
         
-        <View>
-            <Button title='AI Chat' onPress={openAI}/>
-            <Text style={styles.text}>Opt-in to User Chat</Text>
-            <Switch
-                trackColor={{false: '#767577', true: '#4ed164'}}
-                thumbColor={isEnabled ? '#ffffff' : '#ffffff'}
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={toggleSwitch}
-                value={isEnabled}
-                style={styles.switch}
-            />
-            <Button title='User Chat' onPress={openUser}/>
-        </View>
+        
+          
+        <GiftedChat
+            messages={messages}
+            showAvatarForEveryMessage={true}
+            onSend={messages => onSend(messages)}
+            user={{
+                _id: auth?.currentUser?.email,
+                name: auth?.currentUser?.displayName,
+                 avatar: auth?.currentUser?.photoURL,
+            }}
+        />
+            
        
             
     );
@@ -120,13 +102,9 @@ const styles = StyleSheet.create({
         width: 370,
         marginTop: 10
     },
-    switch: {
-        marginLeft: "auto",
-        marginRight: 20,
-    },
-    text: {
-        fontSize: 18,
+    bottomContainer: {
+        flex: 1,
     }
 });
 
-export default Chat;
+export default AIChat;

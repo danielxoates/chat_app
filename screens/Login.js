@@ -13,7 +13,7 @@ const Login = ({navigation}) => {
         navigation.navigate('Register');
     }
     const instantLogin = () => {
-        navigation.navigate('HomePage');
+        navigation.navigate('Home Page');
     }
 
     const signin = () => {

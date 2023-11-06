@@ -5,10 +5,10 @@ import {auth} from '../firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 const Register = () => {
-    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [avatar, setAvatar] = useState('');
+    const [passwordCheck, setPasswordCheck] = useState('');
 
     const register = () => {
         createUserWithEmailAndPassword(auth, email, password)
@@ -35,10 +35,10 @@ const Register = () => {
     return (
         <View style={styles.container}>
             <Input
-                placeholder='Enter your name'
-                label='Name'
-                value={name}
-                onChangeText={text => setName(text)}
+                placeholder='Enter a username'
+                label='Username'
+                value={username}
+                onChangeText={text => setUsername(text)}
             />
             <Input
                 placeholder='Enter your email'
@@ -54,10 +54,11 @@ const Register = () => {
                 secureTextEntry
             />
             <Input
-                placeholder='Enter your image URL'
-                label='Profile Picture'
-                value={avatar}
-                onChangeText={text => setAvatar(text)}
+                placeholder='Re-enter your password'
+                label='Password Check'
+                value={passwordCheck}
+                onChangeText={text => setPasswordCheck(text)}
+                secureTextEntry
             />
             <Button title='Register' onPress={register} style={styles.button}/>
         </View>
