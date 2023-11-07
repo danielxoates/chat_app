@@ -4,7 +4,7 @@ import { Input, Button } from 'react-native-elements';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+var RNFS = require('react-native-fs');
 const Login = ({navigation}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -12,7 +12,34 @@ const Login = ({navigation}) => {
     const openRegisterScreen = () => {
         navigation.navigate('Register');
     }
+
+    const writeFile = async (path) => {
+        var date = new Date();
+        var now_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
+                date.getUTCDate(), date.getUTCHours(),
+                date.getUTCMinutes(), date.getUTCSeconds());
+        const jsonData= {"start": now_utc};
+        const jsonString = JSON.stringify(jsonData);
+        await RNFS.writeFile(path, jsonString, 'utf8', function (err) {
+            if (err) {
+                return console.log(err);
+            }
+            console.log("file saved!");
+        }); 
+    };
+
     const instantLogin = () => {
+        var path= RNFS.DocumentDirectoryPath + '/data.json';
+        RNFS.exists(path)
+            .then((exists) => {
+                if(exists){
+                    console.log("file exists");
+                }
+                else{
+                    writeFile(path);
+                }
+            }
+        )
         navigation.navigate('Home Page');
     }
 
