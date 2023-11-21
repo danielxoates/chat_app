@@ -1,8 +1,6 @@
 import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Avatar, Button, Image } from 'react-native-elements';
-import { auth, db } from '../firebase';
-import { signOut } from 'firebase/auth';
 import speechBubble from '../assets/speechBubble.png';
 import { Vibration } from 'react-native';
 var RNFS = require('react-native-fs');
@@ -27,11 +25,7 @@ const HomePage = ({navigation}) => {
     }
 
     const signOutNow = () => {
-        signOut(auth).then(() => {
-            navigation.navigate('Login');
-        }).catch((error) => {
-            Alert('Error occured');
-        });
+        navigation.navigate('Login');
     }
 
     const writeFile = async (path) => {
@@ -98,7 +92,7 @@ const HomePage = ({navigation}) => {
 
     useFocusEffect(() => {
         setTimer();
-      }, []
+      }
     );
 
     useEffect(() => {

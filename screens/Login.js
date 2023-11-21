@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native'
 import { Input, Button } from 'react-native-elements';
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import Icon from 'react-native-vector-icons/FontAwesome';
 var RNFS = require('react-native-fs');
 const Login = ({navigation}) => {
     const [email, setEmail] = useState('');
@@ -44,15 +41,7 @@ const Login = ({navigation}) => {
     }
 
     const signin = () => {
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                navigation.navigate('HomePage')
-            })
-            .catch((error) => {
-                const errorCode=error.code;
-                const errorMessage=error.message;
-                alert(errorMessage);
-            });
+         navigation.navigate('HomePage')
     }
 
     return (
