@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native'
+import { View, StyleSheet, ScrollView, Alert } from 'react-native'
 import { Input, Button } from 'react-native-elements';
 import { SelectList } from 'react-native-dropdown-select-list';
 
@@ -19,7 +19,39 @@ const Register = ({navigation}) => {
         {key:'6', value:'Porn'},
     ]
 
-    const register = () => {
+
+    const register = async () => {
+        var details = {
+            username: username,
+            password: password
+        };
+        var formBody = [];
+        for(var property in details){
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        try{
+            await fetch (
+    
+                'https://w21003534.nuwebspace.co.uk/final_project/php/Register.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                    body: formBody
+                })
+                    .then(response => {
+                        response.text()
+                            .then(
+                                console.log(response),
+                                Alert.alert('alert'),
+                            )
+                    })
+        } 
+        catch(err){
+            console.log(err);
+        }  
+        
         navigation.navigate('Login');
     }
 

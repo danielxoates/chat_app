@@ -50,7 +50,6 @@ class User{
     public function Register(){
         $input = array();
         $errors=array();
-        echo 'in user';
         $db=new Database();
         $sql = "SELECT username FROM users WHERE username = '$this->uname'";
         $result=$db->executeSQL($sql);
