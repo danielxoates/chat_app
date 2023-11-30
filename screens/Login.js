@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Alert } from 'react-native'
 import { Input, Button } from 'react-native-elements';
 var RNFS = require('react-native-fs');
 const Login = ({navigation}) => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const openRegisterScreen = () => {
@@ -40,8 +40,60 @@ const Login = ({navigation}) => {
         navigation.navigate('Home Page');
     }
 
-    const signin = () => {
-         navigation.navigate('HomePage')
+    const signin = async () => {
+        var path= RNFS.DocumentDirectoryPath + '/data.json';
+        RNFS.exists(path)
+            .then((exists) => {
+                if(exists){
+                    console.log("file exists");
+                }
+                else{
+                    writeFile(path);
+                }
+            }
+        )
+        var details = {
+            username: username,
+            password: password
+        };
+        var formBody = [];
+        for(var property in details){
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        try{
+            await fetch (
+                'https://w21003534.nuwebspace.co.uk/final_project/php/Login.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                    body: formBody
+                })
+                    .then(response => {
+                        response.text()
+                            .then(text =>{
+                                text=text.replace("{","")
+                                text=text.replace("}","")
+                                text=text.replace("[","")
+                                text=text.replace("]","")
+                                text=text.replace(/'/g, "")
+                                text=text.replace(/"/g, "")
+                                text=text.split(":");
+                                console.log(text[1])
+                                if(text[1]=="logged in"){
+                                    navigation.navigate('Home Page')
+                                }
+                                else{
+                                    Alert.alert("Username or password incorrect");
+                                }
+                            });
+                    })
+        } 
+        catch(err){
+            console.log(err);
+            Alert.alert("Error occured please try again");
+        }
     }
 
     return (
@@ -50,8 +102,8 @@ const Login = ({navigation}) => {
                 placeholder='Enter your email'
                 label='Email'
                 leftIcon={{ type: 'material', name: 'email' }}
-                value={email}
-                onChangeText={text => setEmail(text)}
+                value={username}
+                onChangeText={text => setUsername(text)}
             />
             <Input
                 placeholder='Enter your password'
@@ -61,7 +113,7 @@ const Login = ({navigation}) => {
                 onChangeText={text => setPassword(text)}
                 secureTextEntry
             />
-            <Button title='Sign in' style={styles.button} onPress={instantLogin}/>
+            <Button title='Sign in' style={styles.button} onPress={signin}/>
             <Button title='Register' style={styles.button} onPress={openRegisterScreen}/>
         </View>
     )
