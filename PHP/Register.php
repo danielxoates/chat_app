@@ -15,14 +15,18 @@ $password=trim($password);
 if ($password==null){
     $errors[]= "Password is empty";
 }
-$user = new User($username, $password);
+$addiction = filter_has_var(INPUT_POST, 'addiction')? $_POST['addiction']:null;
+$addiction=trim($addiction);
+if ($addiction==null){
+    $errors[]= "addiction is empty";
+}
+$user = new User($username);
+$user->setAddiction($addiction);
+$user->setPassword($password);
 $result=$user->Register();
 if(empty($result[1]) && empty($errors)){
-    //echo var_dump($result[0]);
     $result=$result[0];
 }else{
-    //echo var_dump($result[1]);
-    //echo var_dump($errors);
     $result=$result[1];
 }
 $finalReturn= array('result' => $result);

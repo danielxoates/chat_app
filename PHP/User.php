@@ -7,11 +7,16 @@ class User{
     private $addiction;
     private $connectedUser;
 
-    public function __construct($user, $pword){
+    public function __construct($user){
         $this->uname=$user;
-        $this->password=$pword;
         include 'Database.php';
         //$this->addiction=$addiction;
+    }
+    public function setAddiction($addiction){
+        $this->addiction=$addiction;
+    }
+    public function setPassword($password){
+        $this->password=$password;
     }
     public function Login(){
         /*ini_set("session.savepath", "/home/unn_w21003534/sessionData");

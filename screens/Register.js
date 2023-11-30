@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native'
 import { Input, Button } from 'react-native-elements';
 import { SelectList } from 'react-native-dropdown-select-list';
 
 const Register = ({navigation}) => {
     const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordCheck, setPasswordCheck] = useState('');
-    const [selected, setSelected] = useState("");
-  
+    const [selected, setSelected] = useState('');
+    const [other, setOther] = useState('');
+    const [read, setRead] = useState(true);
     const data = [
         {key:'1', value:'Cocaine'},
         {key:'2', value:'Ketamine'},
@@ -17,13 +17,32 @@ const Register = ({navigation}) => {
         {key:'4', value:'PCP',},
         {key:'5', value:'Self-harm'},
         {key:'6', value:'Porn'},
+        {key:'7', value:'Other'},
     ]
 
 
     const register = async () => {
+        if(username==''){
+            Alert.alert('Username field can\'t be empty');
+            return
+        }
+        if(password=='' || passwordCheck==''){
+            Alert.alert('Passwords fields can\'t be empty');
+            return
+        }
+        if(password!=passwordCheck){
+            Alert.alert('Passwords must match');
+            return
+        }
+        if(selected==''){
+            Alert.alert('Addiction must be set');
+            return
+        }
+
         var details = {
             username: username,
-            password: password
+            password: password,
+            addiction: selected
         };
         var formBody = [];
         for(var property in details){
@@ -34,7 +53,6 @@ const Register = ({navigation}) => {
         formBody = formBody.join("&");
         try{
             await fetch (
-    
                 'https://w21003534.nuwebspace.co.uk/final_project/php/Register.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
@@ -82,10 +100,8 @@ const Register = ({navigation}) => {
                     data={data}
                     setSelected={(val) =>setSelected(val)}
                     save="value"
-                    style={styles.selectBox}
                     maxHeight={100}
                 />
-
                 <Button title='Register' onPress={register} style={styles.button}/>
             </View>
         </ScrollView>
@@ -95,17 +111,13 @@ const Register = ({navigation}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
         padding: 10,
         marginTop: 100,
     },
     button: {
-        width: 370,
+        flex: 1,
         marginTop: 10
     },
-    selectBox: {
-        width: 370,
-    }
 });
 
 export default Register;
