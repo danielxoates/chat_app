@@ -14,7 +14,8 @@ $password=trim($password);
 if (empty($password)){
     $errors[]= "Password is empty";
 }
-$user = new User($username, $password);
+$user = new User($username);
+$user->setPassword($password);
 $result=$user->Login();
 if(empty($result[1]) && empty($errors)){
     $result=$result[0];

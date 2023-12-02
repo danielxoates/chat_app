@@ -79,13 +79,13 @@ const Login = ({navigation}) => {
                                 text=text.replace("]","")
                                 text=text.replace(/'/g, "")
                                 text=text.replace(/"/g, "")
-                                text=text.split(":");
+                                text=text.split(":")
                                 console.log(text[1])
                                 if(text[1]=="logged in"){
                                     navigation.navigate('Home Page')
                                 }
                                 else{
-                                    Alert.alert("Username or password incorrect");
+                                    Alert.alert("Username or password incorrect")
                                 }
                             });
                     })

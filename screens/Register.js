@@ -60,17 +60,29 @@ const Register = ({navigation}) => {
                 })
                     .then(response => {
                         response.text()
-                            .then(
-                                console.log(response),
-                                Alert.alert('alert'),
-                            )
+                            .then(text =>{
+                                text=text.replace("{","")
+                                text=text.replace("}","")
+                                text=text.replace("[","")
+                                text=text.replace("]","")
+                                text=text.replace(/'/g, "")
+                                text=text.replace(/"/g, "")
+                                text=text.split(":")
+                                console.log(text[1])
+                                if (text[1]=='Registered'){
+                                    Alert.alert('Account created')
+                                    navigation.navigate('Login');
+                                }
+                                else{
+                                    Alert.alert('Username Taken')
+                                }
+                            }
+                            );
                     })
         } 
         catch(err){
             console.log(err);
         }  
-        
-        navigation.navigate('Login');
     }
 
     return (
