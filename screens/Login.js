@@ -113,7 +113,7 @@ const Login = ({navigation}) => {
                 onChangeText={text => setPassword(text)}
                 secureTextEntry
             />
-            <Button title='Sign in' style={styles.button} onPress={signin}/>
+            <Button title='Sign in' style={styles.button} onPress={instantLogin}/>
             <Button title='Register' style={styles.button} onPress={openRegisterScreen}/>
         </View>
     )

@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, Alert} from 'react-native';
 import { Avatar, Button, Image } from 'react-native-elements';
 import { GiftedChat } from 'react-native-gifted-chat';
 import homeImage from '../assets/home.png';
@@ -7,6 +7,7 @@ import homeImage from '../assets/home.png';
 const Chat =({navigation}) => {
     const [messages, setMessages] = useState([]);
     const [isEnabled, setIsEnabled] = useState(false);
+    const [clickable, setClickable] = useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const signOutNow = () => {
         navigation.navigate('Login');
@@ -23,6 +24,7 @@ const Chat =({navigation}) => {
     const openUser = () =>{
         navigation.navigate('User Chat')
     }
+
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -64,7 +66,7 @@ const Chat =({navigation}) => {
                     style={styles.switch}
                 />
             </View>
-            <Button title='User Chat' onPress={openUser}/>
+            <Button title='User Chat' onPress={openUser} disabled={!isEnabled}/>
         </View>
        
             
