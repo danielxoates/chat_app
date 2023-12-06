@@ -42,8 +42,10 @@ const Register = ({navigation}) => {
         var details = {
             username: username,
             password: password,
-            addiction: selected
+            addiction: selected,
+            type: 'register',
         };
+        console.log(username);
         var formBody = [];
         for(var property in details){
             var encodedKey = encodeURIComponent(property);
@@ -53,7 +55,7 @@ const Register = ({navigation}) => {
         formBody = formBody.join("&");
         try{
             await fetch (
-                'https://w21003534.nuwebspace.co.uk/final_project/php/Register.php', {
+                'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
                     body: formBody
@@ -61,6 +63,7 @@ const Register = ({navigation}) => {
                     .then(response => {
                         response.text()
                             .then(text =>{
+                                console.log(text)
                                 text=text.replace("{","")
                                 text=text.replace("}","")
                                 text=text.replace("[","")

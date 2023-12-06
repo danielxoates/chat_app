@@ -10,51 +10,15 @@ const Login = ({navigation}) => {
         navigation.navigate('Register');
     }
 
-    const writeFile = async (path) => {
-        var date = new Date();
-        var now_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
-                date.getUTCDate(), date.getUTCHours(),
-                date.getUTCMinutes(), date.getUTCSeconds());
-        const jsonData= {"start": now_utc};
-        const jsonString = JSON.stringify(jsonData);
-        await RNFS.writeFile(path, jsonString, 'utf8', function (err) {
-            if (err) {
-                return console.log(err);
-            }
-            console.log("file saved!");
-        }); 
-    };
-
     const instantLogin = () => {
-        var path= RNFS.DocumentDirectoryPath + '/data.json';
-        RNFS.exists(path)
-            .then((exists) => {
-                if(exists){
-                    console.log("file exists");
-                }
-                else{
-                    writeFile(path);
-                }
-            }
-        )
         navigation.navigate('Home Page');
     }
 
     const signin = async () => {
-        var path= RNFS.DocumentDirectoryPath + '/data.json';
-        RNFS.exists(path)
-            .then((exists) => {
-                if(exists){
-                    console.log("file exists");
-                }
-                else{
-                    writeFile(path);
-                }
-            }
-        )
         var details = {
             username: username,
-            password: password
+            password: password,
+            type: 'login',
         };
         var formBody = [];
         for(var property in details){
@@ -65,7 +29,7 @@ const Login = ({navigation}) => {
         formBody = formBody.join("&");
         try{
             await fetch (
-                'https://w21003534.nuwebspace.co.uk/final_project/php/Login.php', {
+                'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
                     body: formBody
@@ -80,7 +44,6 @@ const Login = ({navigation}) => {
                                 text=text.replace(/'/g, "")
                                 text=text.replace(/"/g, "")
                                 text=text.split(":")
-                                console.log(text[1])
                                 if(text[1]=="logged in"){
                                     navigation.navigate('Home Page')
                                 }
@@ -113,7 +76,7 @@ const Login = ({navigation}) => {
                 onChangeText={text => setPassword(text)}
                 secureTextEntry
             />
-            <Button title='Sign in' style={styles.button} onPress={instantLogin}/>
+            <Button title='Sign in' style={styles.button} onPress={signin}/>
             <Button title='Register' style={styles.button} onPress={openRegisterScreen}/>
         </View>
     )

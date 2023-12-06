@@ -3,14 +3,12 @@
 class User{
     private $uname;
     private $password;
-    private $points;
+    private $startTime;
     private $addiction;
     private $connectedUser;
 
     public function __construct($user){
         $this->uname=$user;
-        include 'Database.php';
-        //$this->addiction=$addiction;
     }
     public function setAddiction($addiction){
         $this->addiction=$addiction;
@@ -18,10 +16,11 @@ class User{
     public function setPassword($password){
         $this->password=$password;
     }
+    public function setTime($time){
+        $this->startTime=$time;
+    }
     public function Login(){
-        /*ini_set("session.savepath", "/home/unn_w21003534/sessionData");
-        session_start();
-        $_SESSION['logged_on']='false';*/
+        $_SESSION['logged_on']='false';
         $input = array();
         $errors=array();
         try{
@@ -32,12 +31,9 @@ class User{
                 $storedPword=$result[0]["pword"];
                 if(password_verify($this->password, $storedPword)){
                     $input[]= 'logged in';
-                }
-                /*$passwordHash=$user->passwordHash;
-                $pwdCheck=password_verify($password, $passwordHash);
-                if ($pwdCheck==true){
                     $_SESSION['logged_on']='true';
-                }*/
+                    $_SESSION['username']=$this->uname;
+                }
                 else{
                     $errors[]= "Either username or password are incorrect";
                 }
@@ -63,14 +59,14 @@ class User{
             $errors[] = 'already registered';
         }
         else{
-            if(!isset($this->points)){
-                $this->points='NULL';
+            if(!isset($this->startTime)){
+                $this->startTime=time();
             }
             if(!isset($this->connectedUser)){
                 $this->connectedUser='NULL';
             }
-            $sql="INSERT INTO users (username, pword, addiction, points, connected_user)
-                VALUES ('$this->uname', '$this->password', '$this->addiction', $this->points, $this->connectedUser);";
+            $sql="INSERT INTO users (username, pword, addiction, startTime, connected_user)
+                VALUES ('$this->uname', '$this->password', '$this->addiction', $this->startTime, $this->connectedUser);";
             $db->executeSQL($sql);
             $input[] = 'Registered';
         }
