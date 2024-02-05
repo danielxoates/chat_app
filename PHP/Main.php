@@ -68,7 +68,7 @@ if($type=='register'){
     }
     $addiction = filter_has_var(INPUT_POST, 'addiction')? $_POST['addiction']:null;
     $addiction=trim($addiction);
-    if ($addiction==null){
+    if ($addiction==null)
         $errors[]= "addiction is empty";
     }
     
@@ -87,7 +87,7 @@ if($type=='register'){
     $result=json_encode($result);
     echo var_export($finalReturn);
     return ($finalReturn);
-}
+
 
 
 
