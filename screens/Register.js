@@ -92,12 +92,6 @@ const Register = ({navigation}) => {
         <ScrollView style={{flex: 1}}>
             <View style={styles.container}>
                 <Input
-                    placeholder='Enter a username'
-                    label='Username'
-                    value={username}
-                    onChangeText={text => setUsername(text)}
-                />
-                <Input
                     placeholder='Enter your password'
                     label='Password'
                     value={password}

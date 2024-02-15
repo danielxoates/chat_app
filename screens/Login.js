@@ -62,8 +62,8 @@ const Login = ({navigation}) => {
     return (
         <View style={styles.container}>
             <Input
-                placeholder='Enter your email'
-                label='Email'
+                placeholder='Enter your username'
+                label='Username'
                 leftIcon={{ type: 'material', name: 'email' }}
                 value={username}
                 onChangeText={text => setUsername(text)}

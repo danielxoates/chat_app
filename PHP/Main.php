@@ -6,8 +6,26 @@ Autoloader::register();
 $errors=array();
 $type = filter_has_var(INPUT_POST, 'type')? $_POST['type']:null;
 $type=trim($type);
+echo $type;
+
 if($type==null){
     $errors="Type is empty";
+}
+
+if($type=='chat'){
+    $file = filter_has_var(INPUT_POST, 'file')? $_POST['file']:null;
+    $log=new Chat($file);
+    $message = filter_has_var(INPUT_POST, 'message')? $_POST['message']:null;
+    $message=trim($message);
+    if($message!=null){
+        $log->addChat($message);
+        $result='success';
+    }
+    else{
+        print_r(array_values($log->readChats()));
+        $result=array_values($log->readChats());
+        return($result);
+    }
 }
 if($type=='set'){
     $username=$_SESSION['username'];
@@ -68,7 +86,7 @@ if($type=='register'){
     }
     $addiction = filter_has_var(INPUT_POST, 'addiction')? $_POST['addiction']:null;
     $addiction=trim($addiction);
-    if ($addiction==null)
+    if ($addiction==null){
         $errors[]= "addiction is empty";
     }
     
@@ -87,6 +105,7 @@ if($type=='register'){
     $result=json_encode($result);
     echo var_export($finalReturn);
     return ($finalReturn);
+}
 
 
 
