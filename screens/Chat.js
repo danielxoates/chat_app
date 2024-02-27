@@ -4,7 +4,8 @@ import { Avatar, Button, Image } from 'react-native-elements';
 import { GiftedChat } from 'react-native-gifted-chat';
 import homeImage from '../assets/home.png';
 
-const Chat =({navigation}) => {
+const Chat =({navigation, route}) => {
+    const {username} = route.params
     const [messages, setMessages] = useState([]);
     const [isEnabled, setIsEnabled] = useState(false);
     const [clickable, setClickable] = useState(false);
@@ -14,15 +15,21 @@ const Chat =({navigation}) => {
     }
 
     const returnToHome = () =>{
-        navigation.navigate('Home Page')
+        navigation.navigate('Home Page', {
+            username: username,
+        })
     }
 
     const openAI = () =>{
-        navigation.navigate('AI Chat')
+        navigation.navigate('AI Chat', {
+            username: username,
+        })
     }
 
     const openUser = () =>{
-        navigation.navigate('User Chat')
+        navigation.navigate('User Chat', {
+            username: username,
+        })
     }
 
 
@@ -48,6 +55,7 @@ const Chat =({navigation}) => {
         })
 
     }, [navigation]);
+
 
 
     

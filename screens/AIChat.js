@@ -5,14 +5,17 @@ import homeImage from '../assets/home.png';
 import ChatBubble from 'react-native-chat-bubble';
 
 
-const AIChat =({navigation}) => {
+
+const AIChat =({navigation, route}) => {
+    const {username} = route.params
     const [messages, setMessages] = useState([])
     const [newMessage, setNewMessage] = useState('')
 
     useEffect(() => {
+        const interval = setInterval(() => {       
         var details = {
-            file: '../chats/chat.txt',
-            type: 'chat',
+            file: '../chats/AI_chats/'+JSON.stringify(username)+'_AI.txt',
+            type: 'chatAI',
         };
         var formBody = [];
         for(var property in details){
@@ -28,13 +31,15 @@ const AIChat =({navigation}) => {
                 body: formBody
             })
                 .then(response => {
-                    response.text()
-                    .then(text => {
-                        setMessages(text)
-                        console.log(text)
+                    response.json()
+                    .then(json => { 
+                        setMessages(json)
+                        console.log(json)
                     })
                 })
-    })
+        }, 5000);
+        return () => clearInterval(interval);
+    },[newMessage])
 
     
 
@@ -42,8 +47,32 @@ const AIChat =({navigation}) => {
         navigation.navigate('Login');
     }
 
-    const returnToHome = () =>{
-        navigation.navigate('Home Page')
+    const returnToHome = () => {
+        navigation.navigate('Home Page', {
+            username: username,
+        })
+    }
+    const sendMessage = () => {
+        
+        var details = {
+            file: '../chats/AI_chats/'+JSON.stringify(username)+'_AI.txt',
+            type: 'chatAI',
+            message: newMessage,
+            id: 1,
+        };
+        var formBody = [];
+        for(var property in details){
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        fetch (
+            'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                body: formBody
+            })
     }
 
     useLayoutEffect(() => {
@@ -61,7 +90,15 @@ const AIChat =({navigation}) => {
     }, [navigation]);
 
     /*const textBubblesJSX = messages.map(
-        message => <ChatBubble>{message}</ChatBubble>)*/
+      (message, i) => <SpeechBubble key={i} ></SpeechBubble>)*/
+    const textBubblesJSX = messages.map(
+        (message, i) => {if(message.charAt(0)=='1'){
+            message=message.substring(1)
+            return(
+            <ChatBubble key={i} bubbleColor='#1084ff' isOwnMessage={true}><Text>{message}</Text></ChatBubble>)
+        }
+        else{ return(<ChatBubble key={i}><Text>{message}</Text></ChatBubble>)}
+    })
     
     return (          
         <>
@@ -72,13 +109,15 @@ const AIChat =({navigation}) => {
                 withTail={true}
                 onPress={() => console.log("Bubble Pressed!")}
             >
-                <Text>Your messa content</Text>
+                <Text>Your message content</Text>
             </ChatBubble>
+           {textBubblesJSX}
             <Input
                 placeholder='Enter a message'
                 value={newMessage}
                 onChangeText={text => setNewMessage(text)}
             />
+            <Button title='Send' onPress={sendMessage}/>
         </>
     );
 }
@@ -96,7 +135,8 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         flex: 1,
-    }
+    },
+
 });
 
 export default AIChat;

@@ -11,7 +11,9 @@ const Login = ({navigation}) => {
     }
 
     const instantLogin = () => {
-        navigation.navigate('Home Page');
+        navigation.navigate('Home Page', {
+            username: username,
+        });
     }
 
     const signin = async () => {
@@ -45,7 +47,9 @@ const Login = ({navigation}) => {
                                 text=text.replace(/"/g, "")
                                 text=text.split(":")
                                 if(text[1]=="logged in"){
-                                    navigation.navigate('Home Page')
+                                    navigation.navigate('Home Page', {
+                                        username: username,
+                                    })
                                 }
                                 else{
                                     Alert.alert("Username or password incorrect")

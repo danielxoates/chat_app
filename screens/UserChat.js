@@ -5,14 +5,17 @@ import { GiftedChat } from 'react-native-gifted-chat';
 import homeImage from '../assets/home.png';
 
 
-const UserChat =({navigation}) => {
+const UserChat =({navigation, route}) => {
+    const {username} = route.params
     const [messages, setMessages] = useState([]);
     const signOutNow = () => {
         navigation.navigate('Login');
     }
 
     const returnToHome = () =>{
-        navigation.navigate('Home Page')
+        navigation.navigate('Home Page', {
+            username: username,
+        })
     }
 
     useLayoutEffect(() => {

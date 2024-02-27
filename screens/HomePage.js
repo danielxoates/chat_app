@@ -8,8 +8,11 @@ import { useFocusEffect } from '@react-navigation/native';
 
 
 
-const HomePage = ({navigation}) => {
+const HomePage = ({navigation, route}) => {
     //const [timer, setTimer] = useState('');
+
+    const {username} = route.params
+
     const [secs, setSecs] = useState(0);
     const [mins, setMins] = useState(0);
     const [hrs, setHrs] = useState(0);
@@ -20,7 +23,9 @@ const HomePage = ({navigation}) => {
 
 
     const openChat = () => {
-        navigation.navigate('Chat');
+        navigation.navigate('Chat', {
+            username: username,
+        });
     }
 
     const signOutNow = () => {
@@ -124,6 +129,7 @@ const HomePage = ({navigation}) => {
     );
 
     useEffect(() => {
+        console.log(JSON.stringify(username))
         const interval = setInterval(() =>{
             setSecs(prevSeconds => prevSeconds+1);
         }, 1000);

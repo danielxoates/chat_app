@@ -6,15 +6,44 @@ Autoloader::register();
 $errors=array();
 $type = filter_has_var(INPUT_POST, 'type')? $_POST['type']:null;
 $type=trim($type);
-echo $type;
+
 
 if($type==null){
     $errors="Type is empty";
 }
 
-if($type=='chat'){
+if($type=='chatAI'){
     $file = filter_has_var(INPUT_POST, 'file')? $_POST['file']:null;
-    $log=new Chat($file);
+    $id = filter_has_var(INPUT_POST, 'id')? $_POST['id']:null;
+    $username=$_SESSION['username'];
+    $filepath=$file.$username.'.txt';
+    $log=new Chat($file, $id);
+    $message = filter_has_var(INPUT_POST, 'message')? $_POST['message']:null;
+    $message=trim($message);
+    if($message!=null){
+        $log->addChat($message);
+        $result='success';
+    }
+    else{
+        //print_r(array_values($log->readChats()));
+        $result=$log->readChats();
+        $finish=json_encode($result);
+        echo $finish;
+        return($finish);
+    }
+}
+if($type=='chatUser'){
+    //TODO checking user conection and connecting if not
+    $file = filter_has_var(INPUT_POST, 'file')? $_POST['file']:null;
+    $id = filter_has_var(INPUT_POST, 'id')? $_POST['id']:null;
+    $username=$_SESSION['username'];
+    $user = new $user($username);
+    if($user->checkConnection()==false){
+        $user->connectUsers();
+    }
+    //TODO get filename sorted
+    $filepath=$file.$username.'.txt';
+    $log=new Chat($file, $id);
     $message = filter_has_var(INPUT_POST, 'message')? $_POST['message']:null;
     $message=trim($message);
     if($message!=null){
@@ -23,7 +52,7 @@ if($type=='chat'){
     }
     else{
         print_r(array_values($log->readChats()));
-        $result=array_values($log->readChats());
+        $result=$log->readChats();
         return($result);
     }
 }
@@ -106,6 +135,7 @@ if($type=='register'){
     echo var_export($finalReturn);
     return ($finalReturn);
 }
+
 
 
 
