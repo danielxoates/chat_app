@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Input, Button, Image } from 'react-native-elements';
 import homeImage from '../assets/home.png';
 import ChatBubble from 'react-native-chat-bubble';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 
@@ -102,16 +103,18 @@ const AIChat =({navigation, route}) => {
     
     return (          
         <>
-            <ChatBubble
-                isOwnMessage={true}
-                bubbleColor='#1084ff'
-                tailColor='#1084ff'
-                withTail={true}
-                onPress={() => console.log("Bubble Pressed!")}
-            >
-                <Text>Your message content</Text>
-            </ChatBubble>
-           {textBubblesJSX}
+            <ScrollView>
+                <ChatBubble
+                    isOwnMessage={true}
+                    bubbleColor='#1084ff'
+                    tailColor='#1084ff'
+                    withTail={true}
+                    onPress={() => console.log("Bubble Pressed!")}
+                >
+                    <Text>Your message content</Text>
+                </ChatBubble>
+            {textBubblesJSX}
+           </ScrollView>
             <Input
                 placeholder='Enter a message'
                 value={newMessage}
