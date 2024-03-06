@@ -90,8 +90,6 @@ const AIChat =({navigation, route}) => {
 
     }, [navigation]);
 
-    /*const textBubblesJSX = messages.map(
-      (message, i) => <SpeechBubble key={i} ></SpeechBubble>)*/
     const textBubblesJSX = messages.map(
         (message, i) => {if(message.charAt(0)=='1'){
             message=message.substring(1)

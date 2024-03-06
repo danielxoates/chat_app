@@ -25,7 +25,6 @@ if($type=='chatAI'){
         $result='success';
     }
     else{
-        //print_r(array_values($log->readChats()));
         $result=$log->readChats();
         $finish=json_encode($result);
         echo $finish;
@@ -33,13 +32,15 @@ if($type=='chatAI'){
     }
 }
 if($type=='chatUser'){
-    //TODO checking user conection and connecting if not
     $file = filter_has_var(INPUT_POST, 'file')? $_POST['file']:null;
     $id = filter_has_var(INPUT_POST, 'id')? $_POST['id']:null;
     $username=$_SESSION['username'];
-    $user = new $user($username);
+    $user = new User($username);
+    $id = $user->checkConnection();
     if($user->checkConnection()==false){
         $user->connectUsers();
+        $id->$user->checkConnection();
+        echo 'connected users';
     }
     //TODO get filename sorted
     $filepath=$file.$username.'.txt';

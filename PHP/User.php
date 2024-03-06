@@ -79,27 +79,27 @@ class User{
         $name = $result[array_rand($result)];
         echo $name['username'];
         print_r($this->uname);
+        $dbName='';
         while($name['username'] == $this->uname){
             $name = $result[array_rand($result)];
             $dbName=$name['username'];
             echo 'reroll', $name['username'];
         }
         //TODO INSERT ERROR CHECKING WITH RESULTS
-        $sql = "INSERT INTO users (connected_user) VALUES ('$dbName') WHERE username='$this->uname'";
+        $sql = "UPDATE users SET connected_user='$dbName', user_num=1 WHERE username='$this->uname'";
         $db->executeSQL($sql);
-        $sql = "INSERT INTO users (connected_user) VALUES ('$this->uname') WHERE username='$dbName'";
+        $sql = "UPDATE users SET connected_user='$this->uname', user_num=2 WHERE username='$dbName'";
         $db->executeSQL($sql);
         echo 'success';
     }
     public function checkConnection(){
         $db=new Database();
-        $sql = "SELECT username FROM users WHERE connected_user IS NOT NULL";
+        $sql = "SELECT username, user_num FROM users WHERE connected_user IS NOT NULL";
         $result=$db->executeSQL($sql);
         for($i=0;$i<sizeof($result);$i++){
-            print_r($result[$i]);
             if(in_array($this->uname,$result[$i])){
-                echo 'true';
-                return true;
+                print_r($result[$i]['user_num']);
+                return $result[$i]['user_num'];
             }
         }
         return false;
