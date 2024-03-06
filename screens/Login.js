@@ -1,68 +1,76 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Alert } from 'react-native'
 import { Input, Button } from 'react-native-elements';
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import Icon from 'react-native-vector-icons/FontAwesome';
 var RNFS = require('react-native-fs');
 const Login = ({navigation}) => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const openRegisterScreen = () => {
         navigation.navigate('Register');
     }
 
-    const writeFile = async (path) => {
-        var date = new Date();
-        var now_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
-                date.getUTCDate(), date.getUTCHours(),
-                date.getUTCMinutes(), date.getUTCSeconds());
-        const jsonData= {"start": now_utc};
-        const jsonString = JSON.stringify(jsonData);
-        await RNFS.writeFile(path, jsonString, 'utf8', function (err) {
-            if (err) {
-                return console.log(err);
-            }
-            console.log("file saved!");
-        }); 
-    };
-
     const instantLogin = () => {
-        var path= RNFS.DocumentDirectoryPath + '/data.json';
-        RNFS.exists(path)
-            .then((exists) => {
-                if(exists){
-                    console.log("file exists");
-                }
-                else{
-                    writeFile(path);
-                }
-            }
-        )
-        navigation.navigate('Home Page');
+        navigation.navigate('Home Page', {
+            username: username,
+        });
     }
 
-    const signin = () => {
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                navigation.navigate('HomePage')
-            })
-            .catch((error) => {
-                const errorCode=error.code;
-                const errorMessage=error.message;
-                alert(errorMessage);
-            });
+    const signin = async () => {
+        var details = {
+            username: username,
+            password: password,
+            type: 'login',
+        };
+        var formBody = [];
+        for(var property in details){
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        try{
+            await fetch (
+                'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                    body: formBody
+                })
+                    .then(response => {
+                        response.text()
+                            .then(text =>{
+                                text=text.replace("{","")
+                                text=text.replace("}","")
+                                text=text.replace("[","")
+                                text=text.replace("]","")
+                                text=text.replace(/'/g, "")
+                                text=text.replace(/"/g, "")
+                                text=text.split(":")
+                                if(text[1]=="logged in"){
+                                    navigation.navigate('Home Page', {
+                                        username: username,
+                                    })
+                                }
+                                else{
+                                    Alert.alert("Username or password incorrect")
+                                }
+                            });
+                    })
+        } 
+        catch(err){
+            console.log(err);
+            Alert.alert("Error occured please try again");
+        }
     }
 
     return (
         <View style={styles.container}>
             <Input
-                placeholder='Enter your email'
-                label='Email'
+                placeholder='Enter your username'
+                label='Username'
                 leftIcon={{ type: 'material', name: 'email' }}
-                value={email}
-                onChangeText={text => setEmail(text)}
+                value={username}
+                onChangeText={text => setUsername(text)}
             />
             <Input
                 placeholder='Enter your password'
@@ -72,7 +80,7 @@ const Login = ({navigation}) => {
                 onChangeText={text => setPassword(text)}
                 secureTextEntry
             />
-            <Button title='Sign in' style={styles.button} onPress={instantLogin}/>
+            <Button title='Sign in' style={styles.button} onPress={signin}/>
             <Button title='Register' style={styles.button} onPress={openRegisterScreen}/>
         </View>
     )

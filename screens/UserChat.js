@@ -1,25 +1,53 @@
 import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Avatar, Button, Image } from 'react-native-elements';
-import { auth, db } from '../firebase';
-import { signOut } from 'firebase/auth';
-import { GiftedChat } from 'react-native-gifted-chat';
-import { addDoc, collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { Input, Button, Image } from 'react-native-elements';
 import homeImage from '../assets/home.png';
+import ChatBubble from 'react-native-chat-bubble';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
-const UserChat =({navigation}) => {
-    const [messages, setMessages] = useState([]);
+const UserChat =({navigation, route}) => {
+    const {username} = route.params
+    const [messages, setMessages] = useState([])
+    const [newMessage, setNewMessage] = useState('')
+    const [id, setId] = useState(0)
     const signOutNow = () => {
-        signOut(auth).then(() => {
-            navigation.navigate('Login');
-        }).catch((error) => {
-            Alert('Error occured');
-        });
+        navigation.navigate('Login');
     }
+    useEffect(() => {
+        const interval = setInterval(() => {       
+        var details = {
+            file: '../chats/AI_chats/'+JSON.stringify(username)+'_AI.txt',
+            type: 'chatUser',
+        };
+        var formBody = [];
+        for(var property in details){
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        fetch (
+            'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                body: formBody
+            })
+                .then(response => {
+                    response.json()
+                    .then(json => { 
+                        setMessages(json)
+                        console.log(json)
+                    })
+                })
+        }, 5000);
+        return () => clearInterval(interval);
+    },[newMessage])
 
     const returnToHome = () =>{
-        navigation.navigate('Home Page')
+        navigation.navigate('Home Page', {
+            username: username,
+        })
     }
 
     useLayoutEffect(() => {
@@ -34,60 +62,62 @@ const UserChat =({navigation}) => {
             )
         })
 
-        const q = query(collection(db, 'chats'), orderBy('createdAt', 'desc'));
-        const unsubscribe = onSnapshot(q, (snapshot) => setMessages(
-            snapshot.docs.map(doc => ({
-                _id: doc.data()._id,
-                createdAt: doc.data().createdAt.toDate(),
-                text: doc.data().text,
-                user: doc.data().user,
-            }))
-        ));
-
-        return () => {
-            unsubscribe();
-        };
 
     }, [navigation]);
-    useEffect(() => {
-        setMessages([
-            {
-                _id: 1,
-                text: "Hello dev",
-                createdAt: new Date(),
-                user: {
-                    _id: 2,
-                    name: 'React Native',
-                    avatar: 'https://placeimg.com/140/140/any',
-                },
-            },
-        ])
-    }, []);
-    const onSend = useCallback((messages = []) => {
-        setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
-        const {_id, createdAt, text, user,} = messages[0]
 
-        addDoc(collection(db, 'chats'), {_id, createdAt, text, user});
-    }, []);
+    const sendMessage = () => {
+        
+        var details = {
+            file: '../chats/User_chats/'+JSON.stringify(username)+'_User.txt',
+            type: 'chatUser',
+            message: newMessage,
+            id: 1,
+        };
+        var formBody = [];
+        for(var property in details){
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        fetch (
+            'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                body: formBody
+            })
+    }
 
+    const textBubblesJSX = messages.map(
+        (message, i) => {if(message.charAt(0)=='1'){
+            message=message.substring(1)
+            return(
+            <ChatBubble key={i} bubbleColor='#1084ff' isOwnMessage={true}><Text>{message}</Text></ChatBubble>)
+        }
+        else{ return(<ChatBubble key={i}><Text>{message}</Text></ChatBubble>)}
+    })
     
-    return (
-        
-        
-          
-        <GiftedChat
-            messages={messages}
-            showAvatarForEveryMessage={true}
-            onSend={messages => onSend(messages)}
-            user={{
-                _id: auth?.currentUser?.email,
-                name: auth?.currentUser?.displayName,
-                 avatar: auth?.currentUser?.photoURL,
-            }}
+    return ( 
+        <>
+        <ScrollView>
+            <ChatBubble
+                isOwnMessage={true}
+                bubbleColor='#1084ff'
+                tailColor='#1084ff'
+                withTail={true}
+                onPress={() => console.log("Bubble Pressed!")}
+            >
+                <Text>Your message content</Text>
+            </ChatBubble>
+        {textBubblesJSX}
+       </ScrollView>
+        <Input
+            placeholder='Enter a message'
+            value={newMessage}
+            onChangeText={text => setNewMessage(text)}
         />
-            
-       
-            
+        <Button title='Send' onPress={sendMessage}/>
+    </>           
     );
 }
 

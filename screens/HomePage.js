@@ -1,8 +1,6 @@
 import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Avatar, Button, Image } from 'react-native-elements';
-import { auth, db } from '../firebase';
-import { signOut } from 'firebase/auth';
 import speechBubble from '../assets/speechBubble.png';
 import { Vibration } from 'react-native';
 var RNFS = require('react-native-fs');
@@ -10,8 +8,11 @@ import { useFocusEffect } from '@react-navigation/native';
 
 
 
-const HomePage = ({navigation}) => {
+const HomePage = ({navigation, route}) => {
     //const [timer, setTimer] = useState('');
+
+    const {username} = route.params
+
     const [secs, setSecs] = useState(0);
     const [mins, setMins] = useState(0);
     const [hrs, setHrs] = useState(0);
@@ -19,59 +20,85 @@ const HomePage = ({navigation}) => {
     const [weeks, setWeeks] = useState(0);
     const [months, setMonths] = useState(0);
     const [years, setYears] = useState(0);
-    const [timeDiff, setTimeDiff] = useState(0);
 
 
     const openChat = () => {
-        navigation.navigate('Chat');
-    }
-
-    const signOutNow = () => {
-        signOut(auth).then(() => {
-            navigation.navigate('Login');
-        }).catch((error) => {
-            Alert('Error occured');
+        navigation.navigate('Chat', {
+            username: username,
         });
     }
 
-    const writeFile = async (path) => {
-        var date = new Date();
-        var now_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
-                date.getUTCDate(), date.getUTCHours(),
-                date.getUTCMinutes(), date.getUTCSeconds());
-        const jsonData= {"start": now_utc};
-        const jsonString = JSON.stringify(jsonData);
-        await RNFS.writeFile(path, jsonString, 'utf8', function (err) {
-            if (err) {
-                return console.log(err);
-            }
-            console.log("file saved!");
-        }); 
-    };
+    const signOutNow = () => {
+        navigation.navigate('Login');
+    }
 
-    const resetTimer = () => {
-        var path= RNFS.DocumentDirectoryPath + '/data.json';
-        writeFile(path);
+
+    const resetTimer = async () => {
+        var details = {
+            type: 'reset',
+        };
+        var formBody = [];
+        for(var property in details){
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        try{
+            await fetch (
+                'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                    body: formBody
+                })
+            }
+        catch(err){
+            console.log(err);
+        }  
     };
 
     const setTimer = async () => {
-        var path= RNFS.DocumentDirectoryPath + '/data.json';
-        const response = await RNFS.readFile(path);
-        
-        var data = JSON.parse(response);
-        var startTime = data.start;
-
-        var date = new Date();
-        var now_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
-            date.getUTCDate(), date.getUTCHours(),
-            date.getUTCMinutes(), date.getUTCSeconds());
-        
-        var timeDiff = now_utc-startTime;
-        var timeDiffSecs=timeDiff/1000;
-        setTimeDiff(timeDiffSecs);
-        setValues(timeDiffSecs);
-        
-    };
+        var details = {
+            type: 'set',
+        };
+        var formBody = [];
+        for(var property in details){
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        try{
+            await fetch (
+                'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                    body: formBody
+                })
+                    .then(response => {
+                        response.text()
+                            .then(text =>{
+                                text=text.replace("{","")
+                                text=text.replace("}","")
+                                text=text.replace("[","")
+                                text=text.replace("]","")
+                                text=text.replace(/'/g, "")
+                                text=text.replace(/"/g, "")
+                                text=text.split(":")
+                                var date = new Date();
+                                var now_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
+                                date.getUTCDate(), date.getUTCHours(),
+                                date.getUTCMinutes(), date.getUTCSeconds());
+                                var timeDiff = (now_utc/1000)-text[1];
+                                setValues(timeDiff);
+                            }
+                            );
+                    })
+        } 
+        catch(err){
+            console.log(err);
+        }  
+    }
 
     const setValues = (seconds) => {
         const minute = 60;
@@ -98,10 +125,11 @@ const HomePage = ({navigation}) => {
 
     useFocusEffect(() => {
         setTimer();
-      }, []
+      }
     );
 
     useEffect(() => {
+        console.log(JSON.stringify(username))
         const interval = setInterval(() =>{
             setSecs(prevSeconds => prevSeconds+1);
         }, 1000);
