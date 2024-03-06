@@ -65,6 +65,29 @@ const UserChat =({navigation, route}) => {
 
     }, [navigation]);
 
+    const sendMessage = () => {
+        
+        var details = {
+            file: '../chats/User_chats/'+JSON.stringify(username)+'_User.txt',
+            type: 'chatUser',
+            message: newMessage,
+            id: 1,
+        };
+        var formBody = [];
+        for(var property in details){
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        fetch (
+            'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                body: formBody
+            })
+    }
+
     const textBubblesJSX = messages.map(
         (message, i) => {if(message.charAt(0)=='1'){
             message=message.substring(1)
