@@ -65,36 +65,43 @@ const Login = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <Input
-                placeholder='Enter your username'
-                label='Username'
-                leftIcon={{ type: 'material', name: 'email' }}
-                value={username}
-                onChangeText={text => setUsername(text)}
-            />
-            <Input
-                placeholder='Enter your password'
-                label='Password'
-                leftIcon={{ type: 'material', name: 'lock' }}
-                value={password}
-                onChangeText={text => setPassword(text)}
-                secureTextEntry
-            />
-            <Button title='Sign in' style={styles.button} onPress={signin}/>
-            <Button title='Register' style={styles.button} onPress={openRegisterScreen}/>
+                <Input
+                    placeholder='Enter your username'
+                    label='Username'
+                    leftIcon={{ type: 'material', name: 'email' }}
+                    value={username}
+                    onChangeText={text => setUsername(text)}
+                />
+                <Input
+                    placeholder='Enter your password'
+                    label='Password'
+                    leftIcon={{ type: 'material', name: 'lock' }}
+                    value={password}
+                    onChangeText={text => setPassword(text)}
+                    secureTextEntry
+                />
+            <View style={{flexDirection:'row', bottom:-150}}>
+                <Button title='Sign in' style={styles.button} onPress={signin}/>
+                <Button title='Register' style={styles.button} onPress={openRegisterScreen}/>
+            </View>
         </View>
+        
     )
 }
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        flexDirection: 'column',
         alignItems: 'center',
-        padding: 10,
-        marginTop: 100,
+        padding: 1,
+        marginTop: 180,
+
     },
     button: {
-        width: 370,
-        marginTop: 10
+        width: 180,
+        marginTop: 10,
+        padding: 10,
+
     }
 });
 

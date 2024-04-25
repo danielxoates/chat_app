@@ -89,31 +89,40 @@ const Register = ({navigation}) => {
     }
 
     return (
-        <ScrollView style={{flex: 1}}>
-            <View style={styles.container}>
-                <Input
-                    placeholder='Enter your password'
-                    label='Password'
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    secureTextEntry
-                />
-                <Input
-                    placeholder='Re-enter your password'
-                    label='Password Check'
-                    value={passwordCheck}
-                    onChangeText={text => setPasswordCheck(text)}
-                    secureTextEntry
-                />
-                <SelectList
-                    data={data}
-                    setSelected={(val) =>setSelected(val)}
-                    save="value"
-                    maxHeight={100}
-                />
+        <View style={styles.container}>
+            <ScrollView>
+                <View>
+                    <Input
+                        placeholder='Enter your username'
+                        label='Username'
+                        value={username}
+                        onChangeText={text => setUsername(text)}
+                    />
+                    <Input
+                        placeholder='Enter your password'
+                        label='Password'
+                        value={password}
+                        onChangeText={text => setPassword(text)}
+                        secureTextEntry
+                    />
+                    <Input
+                        placeholder='Re-enter your password'
+                        label='Password Check'
+                        value={passwordCheck}
+                        onChangeText={text => setPasswordCheck(text)}
+                        secureTextEntry
+                    />
+                    <SelectList
+                        data={data}
+                        setSelected={(val) =>setSelected(val)}
+                        save="value"
+                        maxHeight={100}
+                    />
+                </View>
                 <Button title='Register' onPress={register} style={styles.button}/>
-            </View>
-        </ScrollView>
+            </ScrollView>
+
+        </View>
     )
 };
 
