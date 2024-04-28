@@ -37,31 +37,54 @@ const HomePage = ({navigation, route}) => {
   };
 
   const resetTimer = async () => {
-    var details = {
-      type: 'reset',
-    };
-    var formBody = [];
-    for (var property in details) {
-      var encodedKey = encodeURIComponent(property);
-      var encodedValue = encodeURIComponent(details[property]);
-      formBody.push(encodedKey + '=' + encodedValue);
-    }
-    formBody = formBody.join('&');
-    try {
-      await fetch(
-        'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php',
+    Alert.alert(
+      'Reset Timer',
+      'Do you want to reset the timer?',
+      [
         {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+          text: 'Cancel',
+          onPress: () => {
+            console.log('Cancel Pressed');
+            // Add any necessary cleanup or return statements here
           },
-          body: formBody,
+          style: 'cancel',
         },
-      );
-    } catch (err) {
-      console.log(err);
-    }
+        {
+          text: 'OK',
+          onPress: async () => {
+            console.log('OK Pressed');
+            var details = {
+              type: 'reset',
+            };
+            var formBody = [];
+            for (var property in details) {
+              var encodedKey = encodeURIComponent(property);
+              var encodedValue = encodeURIComponent(details[property]);
+              formBody.push(encodedKey + '=' + encodedValue);
+            }
+            formBody = formBody.join('&');
+            try {
+              await fetch(
+                'https://w21003534.nuwebspace.co.uk/final_project/php/Main.php',
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type':
+                      'application/x-www-form-urlencoded;charset=UTF-8',
+                  },
+                  body: formBody,
+                },
+              );
+            } catch (err) {
+              console.log(err);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
+  
 
   const setTimer = async () => {
     var details = {
@@ -171,13 +194,13 @@ const HomePage = ({navigation, route}) => {
 
   return (
     <View style={styles.container}>
-      <Text>{years} years</Text>
-      <Text>{months} months</Text>
-      <Text>{weeks} weeks</Text>
-      <Text>{days} days</Text>
-      <Text>{hrs} hours</Text>
-      <Text>{mins} minutes</Text>
-      <Text>{secs} seconds</Text>
+      <Text style={styles.timer}>{years} years</Text>
+      <Text style={styles.timer}>{months} months</Text>
+      <Text style={styles.timer}>{weeks} weeks</Text>
+      <Text style={styles.timer}>{days} days</Text>
+      <Text style={styles.timer}>{hrs} hours</Text>
+      <Text style={styles.timer}>{mins} minutes</Text>
+      <Text style={styles.timer}>{secs} seconds</Text>
       <Button
         title="Reset timer"
         onPress={resetTimer}
@@ -214,7 +237,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     padding: 10,
-    marginTop: 100,
+    marginTop: 70,
   },
   button: {
     width: 370,
@@ -232,7 +255,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 4,
-    marginTop: 10,
+    marginTop: 25,
+  },
+  timer: {
+    fontSize: 20,
   },
 });
 
