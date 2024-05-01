@@ -18,7 +18,7 @@ const Login = ({navigation}) => {
 
     const signin = async () => {
         var details = {
-            username: username,
+            username: username.toLowerCase(),
             password: password,
             type: 'login',
         };

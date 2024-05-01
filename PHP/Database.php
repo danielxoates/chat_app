@@ -11,9 +11,6 @@
 class Database
 {
     private $dbConnection;
-    private $serverName;
-    private $username;
-    private $password;
 
     public function __construct()
     {
@@ -26,7 +23,6 @@ class Database
             $this->dbConnection = new PDO("mysql:host=nuwebspace_db;dbname=w21003534",
             "w21003534", "Monkey02");
             $this->dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            echo 'connected';
         }
         catch(Exception $e){
             throw new Exception("Connection error". $e->getMessage(), 0, $e);

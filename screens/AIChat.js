@@ -36,7 +36,7 @@ const AIChat = ({navigation, route}) => {
           console.log(json);
         });
       });
-    }, 5000);
+    }, 1000);
     return () => clearInterval(interval);
   }, [newMessage]);
 

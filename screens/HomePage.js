@@ -10,7 +10,6 @@ import {
 import {Avatar, Button, Image} from 'react-native-elements';
 import speechBubble from '../assets/speechBubble.png';
 import {Vibration} from 'react-native';
-var RNFS = require('react-native-fs');
 import {useFocusEffect} from '@react-navigation/native';
 
 const HomePage = ({navigation, route}) => {

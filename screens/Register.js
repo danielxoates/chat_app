@@ -40,7 +40,7 @@ const Register = ({navigation}) => {
         }
 
         var details = {
-            username: username,
+            username: username.toLowerCase(),
             password: password,
             addiction: selected,
             type: 'register',

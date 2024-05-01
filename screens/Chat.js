@@ -1,18 +1,92 @@
 import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch, Alert} from 'react-native';
-import { Avatar, Button, Image } from 'react-native-elements';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { Button, Image } from 'react-native-elements';
 import homeImage from '../assets/home.png';
+import RNFS from 'react-native-fs';
 
 const Chat =({navigation, route}) => {
     const {username} = route.params
-    const [messages, setMessages] = useState([]);
-    const [isEnabled, setIsEnabled] = useState(false);
-    const [clickable, setClickable] = useState(false);
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+    const path = RNFS.DocumentDirectoryPath + '/'+ username + 'state.txt'
+    const [isEnabled, setIsEnabled] = useState(false)
+    const toggleSwitch = () => setIsEnabled(previousState => !previousState)
     const signOutNow = () => {
-        navigation.navigate('Login');
+        navigation.navigate('Login')
     }
+
+    useEffect(() => {
+
+        if(RNFS.exists(path)){
+                setSwitch();
+        }
+        else{
+            RNFS.writeFile(path, 'f', 'utf8')  
+            .then((success) => {
+                console.log('FILE WRITTEN!');
+              })
+              .catch((err) => {
+                console.log(err.message);
+            });
+            setSwitch();
+        }
+    }, []);
+
+    const setSwitch = () => {
+        RNFS.exists(path)
+        .then(exists => {
+          if (exists) {
+            // File exists, read its contents
+            return RNFS.readFile(path, 'utf8')
+          } else {
+            // File does not exist, handle appropriately
+            throw new Error('File not found')
+          }
+        })
+        .then(contents => {
+          console.log('File contents:', contents)
+          if(contents == '' || contents=='f'){
+            RNFS.writeFile(path, 'f', 'utf8')  
+            .then((success) => {
+                console.log('FILE WRITTEN!');
+              })
+              .catch((err) => {
+                console.log(err.message);
+            });
+          }
+          else{
+            setIsEnabled(true);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    const switchPressed = () => {
+    RNFS.exists(path)
+    .then(async exists => {
+        if (exists) {
+            // File exists, read its contents
+            return RNFS.readFile(path, 'utf8')
+        } else {
+            // File does not exist, create it and write 'f' to it
+            await RNFS.writeFile(path, 'f', 'utf8');
+            return 'f'; // Resolve with 'f' after writing
+        }
+    })
+    .then(contents => {
+        console.log('File contents:', contents);
+        if (contents === 'f') {
+            setIsEnabled(true);
+            return RNFS.writeFile(path, 't', 'utf8');
+        } else {
+            setIsEnabled(false);
+            return RNFS.writeFile(path, 'f', 'utf8');
+        }
+    })
+    .then(() => {
+        console.log('File updated successfully');
+    })
+    .catch(error => console.error('Error:', error));
+};
+
 
     const returnToHome = () =>{
         navigation.navigate('Home Page', {
@@ -72,6 +146,7 @@ const Chat =({navigation, route}) => {
                     onValueChange={toggleSwitch}
                     value={isEnabled}
                     style={styles.switch}
+                    onChange={ switchPressed }
                 />
             </View>
             <Button title='User Chat' onPress={openUser} disabled={!isEnabled}/>
