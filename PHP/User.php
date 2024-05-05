@@ -81,42 +81,54 @@ class User
         $db = new Database();
         $sql = "SELECT prev_users FROM users WHERE username = '$this->uname'";
         $result = $db->executeSQL($sql);
-        print_r($result[0]['prev_users']);
-        $prevNames=$result[0];
-
+        $prevNames=$result[0]['prev_users'];
+        $prevNames= json_decode($prevNames);
     
         // Fetch random username not in prev_users and with connected_user as null
         $sql = "SELECT username FROM users WHERE connected_user IS NULL";
         $result = $db->executeSQL($sql);
-        //TODO get reults and check for names that aren't in prevNames
         // Check if there are users available
-        if ($result) {
-            $randomUserName = null;
-            
+        if (sizeof($result)>1) {
+            $availableUsers = array_column($result, 'username');
+
+            // Check if all available users are already in prevNames
+            $remainingUsers = array_diff($availableUsers, $prevNames->names);
+
             // Iterate over the result until a suitable user is found
-            while (!$randomUserName) {
-                // Get a random user from the result
-                $randomUserIndex = array_rand($result);
-                $randomUserName = $result[$randomUserIndex]['username'];
-                if($randomUserName==$this->uname){
-                    $randomUserName=null;
+            if(sizeof($remainingUsers)>1){
+                $randomUserName = null;
+                while (!$randomUserName && sizeof($remainingUsers)>1) {
+                    // Get a random user from the remaining available users
+                    $randomUser = $remainingUsers[array_rand($remainingUsers)];
+        
+                    if ($randomUser == $this->uname) {
+                        // Skip if the random user is the same as the current user
+                        continue;
+                    }
+        
+                    $randomUserName = $randomUser;
                 }
-                echo 'found user '.$randomUserName;
-    
-                // Check if the randomly selected user is not in prev_users
-                if (in_array($randomUserName, $prevNames)) {
-                    $randomUserName = null; // Reset the value if it's in prev_users
-                }
-            }  
+            }
+            else{
+                return;
+            }
+            array_push($prevNames->names, $randomUserName);
+            $prevNames=json_encode($prevNames);
             // Update connected_user for both users
-            $sql = "UPDATE users SET connected_user='$randomUserName', user_num=1, prev_users='$randomUserName' WHERE username='$this->uname'";
+            $sql = "UPDATE users SET connected_user='$randomUserName', user_num=1, prev_users='$prevNames', switch_state=1 WHERE username='$this->uname'";
             $db->executeSQL($sql);
-            $sql = "UPDATE users SET connected_user='$this->uname', user_num=2, prev_users='$this->uname' WHERE username='$randomUserName'";
-            $db->executeSQL($sql);
-            
-            echo $randomUserName; // Output the randomly selected username
+            $sql = "SELECT prev_users FROM users WHERE  username = '$randomUserName'";
+            $result=$db->executeSQL($sql);
+            $prevNames=$result[0]['prev_users'];
+            $prevNames= json_decode($prevNames);
+            array_push($prevNames->names, $this->uname);
+            $prevNames=json_encode($prevNames);
+            $sql = "UPDATE users SET connected_user='$this->uname', user_num=2, prev_users='$prevNames', switch_state=1 WHERE username='$randomUserName'";
+            $db->executeSQL($sql);    
+// Output the randomly selected username
         } else {
-            echo "No available users found.";
+            //echo "No available users found.";
+            return;
         }
     }
     public function checkConnection()
@@ -133,5 +145,26 @@ class User
             }
         }
         return false;
+    }
+    public function disconnect()
+    {
+        $db = new Database();
+        $sql = "SELECT connected_user FROM users WHERE username='$this->uname'";
+        $result=$db->executeSQL($sql);
+        $secondUser=$result[0]['connected_user'];
+        echo $secondUser;
+        $sql = "UPDATE users SET connected_user=NULL, switch_state=0, alert=1 WHERE username='$secondUser'";
+        $db->executeSQL($sql);
+        $sql = "UPDATE users SET connected_user=NULL, switch_state=0 WHERE username='$this->uname'";
+        $db->executeSQL($sql);
+    }
+    public function checkState()
+    {
+        $db = new Database();
+        $sql = "SELECT switch_state, alert FROM users WHERE username='$this->uname'";
+        $result=$db->executeSQL($sql);
+        $sql="UPDATE users SET alert=0 WHERE username='$this->uname'";
+        $db->executeSQL($sql);
+        return $result;
     }
 }

@@ -37,9 +37,15 @@ if ($type == 'chatUser') {
     if ($user->checkConnection() === false) {
         $user->connectUsers();
         $info = $user->checkConnection();
-        $id = $info['user_num'];
-        $other_user = $info['connected_user'];
-        echo 'connected users';
+        if($info===false){
+            echo 'error';
+            return json_encode('Error');
+        }
+        else{
+            $id = $info['user_num'];
+            $other_user = $info['connected_user'];
+            echo 'connected users';
+        }
     } else {
         $info=$user->checkConnection();
         $id = $info['user_num'];
@@ -68,6 +74,19 @@ if ($type == 'chatUser') {
         echo json_encode($finish);
         return (json_encode($finish));
     }
+}
+if ($type == 'disconnect'){
+    $username = strtolower(filter_has_var(INPUT_POST, 'user') ? $_POST['user'] : null);
+    $user = new User($username);
+    $user->disconnect();
+}
+if ($type=='checkState'){
+    $username = strtolower(filter_has_var(INPUT_POST, 'user') ? $_POST['user'] : null);
+    $user = new User($username);
+    $result=$user->checkState();
+    //print_r($result);
+    $result=$result[0];
+    echo json_encode($result);
 }
 if ($type == 'set') {
     $username = $_SESSION['username'];

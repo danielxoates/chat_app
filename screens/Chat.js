@@ -14,77 +14,115 @@ const Chat =({navigation, route}) => {
     }
 
     useEffect(() => {
-
-        if(RNFS.exists(path)){
-                setSwitch();
+        var details = {
+            type: 'checkState',
+            user: username,
+        };
+        var formBody = [];
+        for (var property in details) {
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + '=' + encodedValue);
         }
-        else{
-            RNFS.writeFile(path, 'f', 'utf8')  
-            .then((success) => {
-                console.log('FILE WRITTEN!');
-              })
-              .catch((err) => {
-                console.log(err.message);
-            });
-            setSwitch();
-        }
+        formBody = formBody.join('&');
+        fetch('https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                },
+                body: formBody,
+        }).then(response => {
+            return response.json()
+        }).then(json => {
+            console.log(json)
+            if(json.switch_state==0){
+                if(json.alert==1){
+                    Alert.alert(
+                        'User disconnected',
+                        'The user has decided to end the conversation. Start a new chat by toggling the switch again',
+                        [
+                            {
+                                text: 'OK', // Button text
+                            }
+                        ],
+                    )
+                }
+            }
+            else{
+                setIsEnabled(true);
+            }
+        })
     }, []);
 
-    const setSwitch = () => {
-        RNFS.exists(path)
-        .then(exists => {
-          if (exists) {
-            // File exists, read its contents
-            return RNFS.readFile(path, 'utf8')
-          } else {
-            // File does not exist, handle appropriately
-            throw new Error('File not found')
+    const setUser= () => {
+
+        var details = {
+            file: '../chats/User_chats/',
+            type: 'chatUser',
+            user: username,
+          };
+    
+          var formBody = [];
+          for (var property in details) {
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formBody.push(encodedKey + '=' + encodedValue);
           }
-        })
-        .then(contents => {
-          console.log('File contents:', contents)
-          if(contents == '' || contents=='f'){
-            RNFS.writeFile(path, 'f', 'utf8')  
-            .then((success) => {
-                console.log('FILE WRITTEN!');
-              })
-              .catch((err) => {
-                console.log(err.message);
+          formBody = formBody.join('&');
+    
+          fetch('https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            },
+            body: formBody,
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.text()
+            })
+            .then(text => {
+                console.log(text)
+                if(text=='error'){
+                    setIsEnabled(false)
+                    Alert.alert(
+                        'No users available',
+                        'There are currently no users available, please try again later',
+                        [{text: 'OK'}]
+                    )
+                }
+            })
+            .catch(error => {
+              console.error('Error during fetch:', error);
             });
-          }
-          else{
-            setIsEnabled(true);
-          }
-        })
-        .catch(error => console.error('Error:', error));
     }
     
     const switchPressed = () => {
-    RNFS.exists(path)
-    .then(async exists => {
-        if (exists) {
-            // File exists, read its contents
-            return RNFS.readFile(path, 'utf8')
-        } else {
-            // File does not exist, create it and write 'f' to it
-            await RNFS.writeFile(path, 'f', 'utf8');
-            return 'f'; // Resolve with 'f' after writing
+        if(isEnabled==true){
+            var details = {
+                type: 'disconnect',
+                user: username,
+            };
+            var formBody = [];
+            for (var property in details) {
+                var encodedKey = encodeURIComponent(property);
+                var encodedValue = encodeURIComponent(details[property]);
+                formBody.push(encodedKey + '=' + encodedValue);
+            }
+            formBody = formBody.join('&');
+            fetch('https://w21003534.nuwebspace.co.uk/final_project/php/Main.php', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                },
+                body: formBody,
+            })
         }
-    })
-    .then(contents => {
-        console.log('File contents:', contents);
-        if (contents === 'f') {
-            setIsEnabled(true);
-            return RNFS.writeFile(path, 't', 'utf8');
-        } else {
-            setIsEnabled(false);
-            return RNFS.writeFile(path, 'f', 'utf8');
+        else{
+            setUser()
         }
-    })
-    .then(() => {
-        console.log('File updated successfully');
-    })
-    .catch(error => console.error('Error:', error));
 };
 
 
@@ -134,9 +172,8 @@ const Chat =({navigation, route}) => {
 
     
     return (
-        
-        <View>
-            <Button title='AI Chat' onPress={openAI}/>
+        <View style={styles.container}>
+            <Button title='AI Chat' onPress={openAI} style={styles.button} />
             <View style={styles.optionContainer}>
                 <Text style={styles.text}>Opt-in to User Chat</Text>
                 <Switch
@@ -146,38 +183,40 @@ const Chat =({navigation, route}) => {
                     onValueChange={toggleSwitch}
                     value={isEnabled}
                     style={styles.switch}
-                    onChange={ switchPressed }
+                    onChange={switchPressed}
                 />
             </View>
-            <Button title='User Chat' onPress={openUser} disabled={!isEnabled}/>
+            <Button title='User Chat' onPress={openUser} disabled={!isEnabled} style={styles.button} />
         </View>
-       
-            
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
-        padding: 10,
-        marginTop: 100,
-    },
-    button: {
-        width: 370,
-        marginTop: 10
-    },
-    switch: {
-        marginLeft: "auto",
-        marginRight: 20,
-    },
-    text: {
-        marginTop: 5,
-        fontSize: 18,
+        backgroundColor: '#f0f0f0', // Background color
+        padding: 20,
     },
     optionContainer: {
         flexDirection: 'row',
-    }
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginVertical: 10,
+    },
+    text: {
+        fontSize: 16,
+        marginRight: 10,
+    },
+    switch: {
+        transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }], // Adjust switch size
+    },
+    button: {
+        marginVertical: 10,
+        height: 50, // Increase button height
+        width: '80%',
+    },
 });
 
 export default Chat;
